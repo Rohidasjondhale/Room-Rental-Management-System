@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Booking</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <nav>
+    <h2>Book Property</h2>
+  </nav>
+
+  <div class="container">
+    <div class="card">
+      <form onsubmit="createBooking(event)">
+        <input type="date" id="checkInDate" required>
+        <input type="date" id="checkOutDate" required>
+        <button type="submit">Create Booking</button>
+      </form>
+    </div>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="js/booking.js"></script>
+</body>
+</html>

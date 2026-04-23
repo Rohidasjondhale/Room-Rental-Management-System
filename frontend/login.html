@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Login</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <nav>
+    <h2>Login</h2>
+  </nav>
+
+  <div class="container">
+    <div class="card">
+      <form onsubmit="login(event)">
+        <input type="email" id="email" placeholder="Enter email" required>
+        <input type="password" id="password" placeholder="Enter password" required>
+        <button type="submit">Login</button>
+      </form>
+
+      <a href="forgot-password.html">Forgot Password?</a>
+      <br><br>
+      <a href="signup.html">Create new account</a>
+    </div>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="js/login.js"></script>
+</body>
+</html>
