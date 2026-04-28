@@ -3,29 +3,6 @@
 <head>
   <title>Dashboard</title>
   <link rel="stylesheet" href="css/style.css">
-  <style>
-    .dashboard-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 20px;
-    }
-
-    .section-title {
-      margin-bottom: 15px;
-    }
-
-    .two-column {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 20px;
-    }
-
-    @media (max-width: 900px) {
-      .two-column {
-        grid-template-columns: 1fr;
-      }
-    }
-  </style>
 </head>
 <body>
   <nav>
@@ -38,47 +15,58 @@
       <button onclick="logout()">Logout</button>
     </div>
 
+    <!-- OWNER -->
     <div id="ownerLayout" style="display: none;">
-      <div class="two-column">
-        <div class="card" id="ownerSection" style="display: none;">
-          <h3 class="section-title">Add Property</h3>
-          <form onsubmit="addProperty(event)">
-            <input type="text" id="title" placeholder="Property title" required>
-            <textarea id="description" placeholder="Description" required></textarea>
-            <input type="text" id="location" placeholder="Location" required>
-            <input type="number" id="price" placeholder="Price" required>
-
-            <select id="priceType" required>
-              <option value="">Select Price Type</option>
-              <option value="day">Per Day</option>
-              <option value="month">Per Month</option>
-              <option value="year">Per Year</option>
-            </select>
-
-            <button type="submit" id="propertySubmitBtn">Add Property</button>
-          </form>
-        </div>
-
-        <div class="card" id="ownerPropertiesSection" style="display: none;">
-          <h3 class="section-title">My Properties</h3>
-          <div id="ownerPropertyList"></div>
-        </div>
+      <div class="dashboard-actions">
+        <button onclick="showOwnerSection('add')">Add Property</button>
+        <button onclick="showOwnerSection('properties')">My Properties</button>
+        <button onclick="showOwnerSection('bookings')">Owner Bookings</button>
       </div>
 
-      <div class="card" id="ownerBookingsSection" style="display: none; margin-top: 20px;">
-        <h3 class="section-title">Owner Bookings</h3>
+      <div class="card" id="ownerSection" style="display: none;">
+        <h3>Add Property</h3>
+        <form onsubmit="addProperty(event)">
+          <input type="text" id="title" placeholder="Property title" required>
+          <textarea id="description" placeholder="Description" required></textarea>
+          <input type="text" id="location" placeholder="Location" required>
+          <input type="number" id="price" placeholder="Price" required>
+
+          <select id="priceType" required>
+            <option value="">Select Price Type</option>
+            <option value="day">Per Day</option>
+            <option value="month">Per Month</option>
+            <option value="year">Per Year</option>
+          </select>
+
+          <button type="submit" id="propertySubmitBtn">Add Property</button>
+        </form>
+      </div>
+
+      <div class="card" id="ownerPropertiesSection" style="display: none;">
+        <h3>My Properties</h3>
+        <div id="ownerPropertyList"></div>
+      </div>
+
+      <div class="card" id="ownerBookingsSection" style="display: none;">
+        <h3>Owner Bookings</h3>
         <div id="ownerBookingList"></div>
       </div>
     </div>
 
+    <!-- TENANT -->
     <div id="tenantLayout" style="display: none;">
+      <div class="dashboard-actions tenant-actions">
+        <button onclick="showTenantSection('properties')">View Properties</button>
+        <button onclick="showTenantSection('bookings')">My Bookings</button>
+      </div>
+
       <div class="card" id="tenantSection" style="display: none;">
-        <h3 class="section-title">Tenant Dashboard</h3>
+        <h3>Tenant Dashboard</h3>
         <a href="properties.html">View Properties</a>
       </div>
 
-      <div class="card" id="myBookingsSection" style="display: none; margin-top: 20px;">
-        <h3 class="section-title">My Bookings</h3>
+      <div class="card" id="myBookingsSection" style="display: none;">
+        <h3>My Bookings</h3>
         <div id="bookingList"></div>
       </div>
     </div>

@@ -6,23 +6,17 @@ exports.createOrder = async (req, res) => {
     const { bookingId } = req.body;
 
     if (!bookingId) {
-      return res.status(400).json({
-        message: "bookingId is required"
-      });
+      return res.status(400).json({ message: "bookingId is required" });
     }
 
     const booking = await Booking.findByPk(bookingId);
 
     if (!booking) {
-      return res.status(404).json({
-        message: "Booking not found"
-      });
+      return res.status(404).json({ message: "Booking not found" });
     }
 
     if (booking.tenantId !== req.user.id) {
-      return res.status(403).json({
-        message: "You can pay only for your own booking"
-      });
+      return res.status(403).json({ message: "You can pay only for your own booking" });
     }
 
     const orderId = "order_" + Date.now();
@@ -37,7 +31,7 @@ exports.createOrder = async (req, res) => {
           customer_id: String(req.user.id),
           customer_name: req.user.name || "User",
           customer_email: req.user.email,
-          customer_phone: "9999999999"
+          customer_phone: req.user.phone || "9999999999"
         },
         order_meta: {
           return_url: `${process.env.FRONTEND_URL}/payment-status.html?order_id={order_id}&booking_id=${booking.id}`
@@ -48,7 +42,7 @@ exports.createOrder = async (req, res) => {
         headers: {
           "x-client-id": process.env.CASHFREE_APP_ID,
           "x-client-secret": process.env.CASHFREE_SECRET_KEY,
-          "x-api-version": process.env.CASHFREE_API_VERSION || "2025-01-01",
+          "x-api-version": process.env.CASHFREE_API_VERSION || "2022-09-01",
           "Content-Type": "application/json"
         }
       }
@@ -62,7 +56,8 @@ exports.createOrder = async (req, res) => {
   } catch (error) {
     console.log("Create Cashfree order error:", error.response?.data || error.message);
     res.status(500).json({
-      message: "Failed to create payment order"
+      message: "Failed to create payment order",
+      error: error.response?.data || error.message
     });
   }
 };
@@ -72,23 +67,17 @@ exports.verifyOrder = async (req, res) => {
     const { orderId, bookingId } = req.body;
 
     if (!orderId || !bookingId) {
-      return res.status(400).json({
-        message: "orderId and bookingId are required"
-      });
+      return res.status(400).json({ message: "orderId and bookingId are required" });
     }
 
     const booking = await Booking.findByPk(bookingId);
 
     if (!booking) {
-      return res.status(404).json({
-        message: "Booking not found"
-      });
+      return res.status(404).json({ message: "Booking not found" });
     }
 
     if (booking.tenantId !== req.user.id) {
-      return res.status(403).json({
-        message: "Unauthorized"
-      });
+      return res.status(403).json({ message: "Unauthorized" });
     }
 
     const cashfreeResponse = await axios.get(
@@ -97,7 +86,7 @@ exports.verifyOrder = async (req, res) => {
         headers: {
           "x-client-id": process.env.CASHFREE_APP_ID,
           "x-client-secret": process.env.CASHFREE_SECRET_KEY,
-          "x-api-version": process.env.CASHFREE_API_VERSION || "2025-01-01"
+          "x-api-version": process.env.CASHFREE_API_VERSION || "2022-09-01"
         }
       }
     );
@@ -121,7 +110,8 @@ exports.verifyOrder = async (req, res) => {
   } catch (error) {
     console.log("Verify Cashfree order error:", error.response?.data || error.message);
     res.status(500).json({
-      message: "Failed to verify payment"
+      message: "Failed to verify payment",
+      error: error.response?.data || error.message
     });
   }
 };

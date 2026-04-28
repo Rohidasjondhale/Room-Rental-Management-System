@@ -21,16 +21,10 @@ welcomeText.innerText = `Welcome, ${user.name} (${user.role})`;
 
 if (user.role === "owner") {
   ownerLayout.style.display = "block";
-  ownerSection.style.display = "block";
-  ownerPropertiesSection.style.display = "block";
-  ownerBookingsSection.style.display = "block";
-  loadOwnerProperties();
-  loadOwnerBookings();
+  showOwnerSection("add");
 } else if (user.role === "tenant") {
   tenantLayout.style.display = "block";
-  tenantSection.style.display = "block";
-  myBookingsSection.style.display = "block";
-  loadMyBookings();
+  showTenantSection("bookings");
 }
 
 async function addProperty(event) {
@@ -103,6 +97,8 @@ function editProperty(id, title, description, location, price, priceType) {
 
   editingPropertyId = id;
   document.getElementById("propertySubmitBtn").innerText = "Update Property";
+
+  ownerSection.scrollIntoView({ behavior: "smooth" });
 }
 
 function resetPropertyForm() {
@@ -111,6 +107,7 @@ function resetPropertyForm() {
   document.getElementById("location").value = "";
   document.getElementById("price").value = "";
   document.getElementById("priceType").value = "";
+
   editingPropertyId = null;
   document.getElementById("propertySubmitBtn").innerText = "Add Property";
 }
@@ -147,7 +144,16 @@ async function loadOwnerProperties() {
         <p><b>Location:</b> ${property.location}</p>
         <p><b>Price:</b> ₹${property.price} / ${property.priceType}</p>
         <p><b>Available:</b> ${property.available ? "Yes" : "No"}</p>
-        <button onclick='editProperty(${property.id}, ${JSON.stringify(property.title)}, ${JSON.stringify(property.description)}, ${JSON.stringify(property.location)}, ${JSON.stringify(property.price)}, ${JSON.stringify(property.priceType)})'>Edit</button>
+
+        <button onclick='editProperty(
+          ${property.id},
+          ${JSON.stringify(property.title)},
+          ${JSON.stringify(property.description)},
+          ${JSON.stringify(property.location)},
+          ${JSON.stringify(property.price)},
+          ${JSON.stringify(property.priceType)}
+        )'>Edit</button>
+
         <button onclick="deleteProperty(${property.id})">Delete</button>
       `;
 
@@ -162,9 +168,7 @@ async function loadOwnerProperties() {
 async function deleteProperty(id) {
   const confirmDelete = confirm("Are you sure you want to delete this property?");
 
-  if (!confirmDelete) {
-    return;
-  }
+  if (!confirmDelete) return;
 
   try {
     const response = await fetch(`${BASE_URL}/properties/${id}`, {
@@ -218,7 +222,9 @@ async function loadMyBookings() {
       return;
     }
 
-    const bookings = [...data.bookings].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    const bookings = [...data.bookings].sort(
+      (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+    );
 
     bookings.forEach((booking) => {
       const div = document.createElement("div");
@@ -229,7 +235,7 @@ async function loadMyBookings() {
         <p><b>Tenant Name:</b> ${user.name}</p>
         <p><b>Tenant Email:</b> ${user.email}</p>
         <p><b>Owner Name:</b> ${booking.Owner ? booking.Owner.name : "N/A"}</p>
-        <p><b>Owner Phone:</b> ${booking.Owner ? booking.Owner.phone : "N/A"}</p>
+        <p><b>Owner Phone:</b> ${booking.Owner ? booking.Owner.phone || "N/A" : "N/A"}</p>
         <p><b>Location:</b> ${booking.Property ? booking.Property.location : "N/A"}</p>
         <p><b>Price:</b> ₹${booking.Property ? booking.Property.price : "N/A"} / ${booking.Property ? booking.Property.priceType : "N/A"}</p>
         <p><b>Booking Date:</b> ${new Date(booking.createdAt).toLocaleDateString()}</p>
@@ -237,7 +243,13 @@ async function loadMyBookings() {
         <p><b>Check-Out:</b> ${new Date(booking.checkOutDate).toLocaleDateString()}</p>
         <p><b>Total Price:</b> ₹${booking.totalPrice} (${booking.Property ? booking.Property.priceType : "N/A"})</p>
         <p><b>Status:</b> ${booking.status}</p>
-        ${booking.status === "cancelled" && booking.cancelReason ? `<p><b>Cancellation Reason:</b> ${booking.cancelReason}</p>` : ""}
+
+        ${
+          booking.status === "cancelled" && booking.cancelReason
+            ? `<p><b>Cancellation Reason:</b> ${booking.cancelReason}</p>`
+            : ""
+        }
+
         ${
           booking.status !== "cancelled" && booking.status !== "completed"
             ? `<button onclick="cancelMyBooking('${booking.id}')">Cancel Booking</button>`
@@ -285,14 +297,21 @@ async function loadOwnerBookings() {
         <h4>${booking.Property ? booking.Property.title : "Property"}</h4>
         <p><b>Tenant Name:</b> ${booking.Tenant ? booking.Tenant.name : "N/A"}</p>
         <p><b>Tenant Email:</b> ${booking.Tenant ? booking.Tenant.email : "N/A"}</p>
-        <p><b>Tenant Phone:</b> ${booking.Tenant ? booking.Tenant.phone : "N/A"}</p>
+        <p><b>Tenant Phone:</b> ${booking.Tenant ? booking.Tenant.phone || "N/A" : "N/A"}</p>
         <p><b>Location:</b> ${booking.Property ? booking.Property.location : "N/A"}</p>
         <p><b>Price:</b> ₹${booking.Property ? booking.Property.price : "N/A"} / ${booking.Property ? booking.Property.priceType : "N/A"}</p>
+        <p><b>Booking Date:</b> ${new Date(booking.createdAt).toLocaleDateString()}</p>
         <p><b>Check-In:</b> ${new Date(booking.checkInDate).toLocaleDateString()}</p>
         <p><b>Check-Out:</b> ${new Date(booking.checkOutDate).toLocaleDateString()}</p>
         <p><b>Total Price:</b> ₹${booking.totalPrice} (${booking.Property ? booking.Property.priceType : "N/A"})</p>
         <p><b>Status:</b> ${booking.status}</p>
-        ${booking.status === "cancelled" && booking.cancelReason ? `<p><b>Cancellation Reason:</b> ${booking.cancelReason}</p>` : ""}
+
+        ${
+          booking.status === "cancelled" && booking.cancelReason
+            ? `<p><b>Cancellation Reason:</b> ${booking.cancelReason}</p>`
+            : ""
+        }
+
         ${
           booking.status !== "cancelled" && booking.status !== "completed"
             ? `
@@ -331,7 +350,10 @@ async function updateBooking(id, status) {
         "Content-Type": "application/json",
         "Authorization": token
       },
-      body: JSON.stringify({ status, cancelReason })
+      body: JSON.stringify({
+        status,
+        cancelReason
+      })
     });
 
     const data = await response.json();
@@ -350,13 +372,11 @@ async function updateBooking(id, status) {
 }
 
 async function cancelMyBooking(id) {
+  const confirmCancel = confirm("Are you sure you want to cancel this booking?");
+
+  if (!confirmCancel) return;
+
   try {
-    const confirmCancel = confirm("Are you sure you want to cancel this booking?");
-
-    if (!confirmCancel) {
-      return;
-    }
-
     const response = await fetch(`${BASE_URL}/bookings/${id}/cancel`, {
       method: "PUT",
       headers: {
@@ -385,5 +405,36 @@ function logout() {
   localStorage.removeItem("propertyId");
   localStorage.removeItem("bookingId");
   localStorage.removeItem("totalPrice");
+
   window.location.href = "login.html";
+}
+
+function showOwnerSection(section) {
+  ownerSection.style.display = "none";
+  ownerPropertiesSection.style.display = "none";
+  ownerBookingsSection.style.display = "none";
+
+  if (section === "add") ownerSection.style.display = "block";
+
+  if (section === "properties") {
+    ownerPropertiesSection.style.display = "block";
+    loadOwnerProperties();
+  }
+
+  if (section === "bookings") {
+    ownerBookingsSection.style.display = "block";
+    loadOwnerBookings();
+  }
+}
+
+function showTenantSection(section) {
+  tenantSection.style.display = "none";
+  myBookingsSection.style.display = "none";
+
+  if (section === "properties") tenantSection.style.display = "block";
+
+  if (section === "bookings") {
+    myBookingsSection.style.display = "block";
+    loadMyBookings();
+  }
 }
